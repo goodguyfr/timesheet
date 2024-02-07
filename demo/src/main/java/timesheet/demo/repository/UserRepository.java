@@ -2,8 +2,8 @@ package timesheet.demo.repository;
 
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
-import timesheet.demo.model.Employee;
+import timesheet.demo.model.User;
 
 @Repository
-public interface EmployeeRepository extends MongoRepository<Employee, String> {
+public interface UserRepository extends MongoRepository<User, String> {
 }
