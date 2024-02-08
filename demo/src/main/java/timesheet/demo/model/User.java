@@ -5,9 +5,10 @@ import lombok.Data;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.util.Set;
+
 @Data
 @Document("user")
-
 public class User {
     @Id
     private String id;
@@ -19,5 +20,7 @@ public class User {
     private String department;
     private String company;
     private String salaryPerHour;
-//    private UserEnum role;
+    @Nullable
+    private Set<String> employeeIDs;
+    private UserEnum role;
 }
