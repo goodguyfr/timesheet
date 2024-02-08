@@ -5,17 +5,17 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import timesheet.demo.model.User;
-import timesheet.demo.service.UserService;
+import timesheet.demo.dto.CreateManagerDTO;
+import timesheet.demo.service.ManagerService;
 
 @RestController
-@RequestMapping("/api/timesheet/user")
-public class UserController {
+@RequestMapping("/api/timesheet/manager")
+public class ManagerController {
     @Autowired
-    UserService userService;
+    ManagerService userService;
 
     @PostMapping("/create")
-    public void createStaff(@RequestBody User employee) {
-        userService.createUser(employee);
+    public void createUser(@RequestBody CreateManagerDTO dto) {
+        userService.createManager(dto);
     }
 }
