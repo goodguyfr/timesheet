@@ -19,5 +19,5 @@ public class User {
     private String department;
     private String company;
     private String salaryPerHour;
-    private UserEnum role;
+//    private UserEnum role;
 }
