@@ -2,9 +2,12 @@ package timesheet.demo.model;
 
 import com.mongodb.lang.Nullable;
 import lombok.Data;
+import lombok.experimental.SuperBuilder;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.time.ZonedDateTime;
+import java.util.Date;
 import java.util.Set;
 
 @Data
@@ -23,4 +26,10 @@ public class User {
     @Nullable
     private Set<String> employeeIDs;
     private UserEnum role;
+    @Nullable
+    private boolean quitJob;
+    @Nullable
+    private Date dateQuitJob;
+    @Nullable
+    private String reasonQuitJob;
 }

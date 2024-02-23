@@ -3,9 +3,13 @@ package timesheet.demo.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import timesheet.demo.dto.CreateManagerDTO;
+import timesheet.demo.dto.DeleteEmployeeDTO;
 import timesheet.demo.model.User;
 import timesheet.demo.model.UserEnum;
 import timesheet.demo.repository.UserRepository;
+
+import java.time.ZonedDateTime;
+import java.util.Date;
 
 @Service
 public class ManagerService {
@@ -24,5 +28,16 @@ public class ManagerService {
         manager.setRole(UserEnum.MANAGER);
 
         userRepository.save(manager);
+    }
+
+    public void deleteEmployee(String id, DeleteEmployeeDTO dto) {
+        User deleteEmployye = userRepository.findById(id).orElse(null);
+        if (deleteEmployye != null && deleteEmployye.getRole().equals(UserEnum.EMPLOYEE)) {
+            deleteEmployye.setReasonQuitJob(dto.getReasonQuitJob());
+            deleteEmployye.setDateQuitJob(new Date());
+            deleteEmployye.setQuitJob(true);
+
+            userRepository.save(deleteEmployye);
+        }
     }
 }
