@@ -4,12 +4,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import timesheet.demo.dto.CreateManagerDTO;
 import timesheet.demo.dto.DeleteEmployeeDTO;
+import timesheet.demo.dto.DeleteManagerDTO;
+import timesheet.demo.exception.ResourceNotFoundException;
 import timesheet.demo.model.User;
 import timesheet.demo.model.UserEnum;
 import timesheet.demo.repository.UserRepository;
 
-import java.time.ZonedDateTime;
-import java.util.Date;
+import java.util.*;
 
 @Service
 public class ManagerService {
@@ -31,13 +32,59 @@ public class ManagerService {
     }
 
     public void deleteEmployee(String id, DeleteEmployeeDTO dto) {
-        User deleteEmployye = userRepository.findById(id).orElse(null);
-        if (deleteEmployye != null && deleteEmployye.getRole().equals(UserEnum.EMPLOYEE)) {
-            deleteEmployye.setReasonQuitJob(dto.getReasonQuitJob());
-            deleteEmployye.setDateQuitJob(new Date());
-            deleteEmployye.setQuitJob(true);
+        User employee = userRepository.findByIdAndQuitJob(id, false)
+                .orElseThrow(() -> new ResourceNotFoundException(User.class, id));
+        if (employee != null && employee.getRole().equals(UserEnum.EMPLOYEE)) {
+            employee.setQuitJob(true);
+            employee.setDateQuitJob(new Date());
+            employee.setReasonQuitJob(dto.getReasonQuitJob());
 
-            userRepository.save(deleteEmployye);
+            userRepository.save(employee);
         }
     }
+
+    public void deleteManager(String id, DeleteManagerDTO dto) {
+        User manager = userRepository.findByIdAndQuitJob(id, false)
+                .orElseThrow(() -> new ResourceNotFoundException(User.class, id));
+        if ( manager.getRole().equals(UserEnum.MANAGER)) {
+            if (manager.getEmployeeIDs() != null) {
+                User newManager = new User();
+
+                if(dto.getNewManagerId() != null) {
+                     newManager = userRepository.findByIdAndQuitJob(dto.getNewManagerId(), false)
+                            .orElseThrow(() -> new ResourceNotFoundException(User.class, id));
+
+                } else {
+                    // Manager has employees --> random manager to management employyes
+                   List<String> userIds = userRepository.findAllByRoleAndQuitJob(manager.getRole(), false)
+                           .stream().map(User::getId).filter(itId -> !itId.equals(id)).toList();
+                   Random  random = new Random();
+//                   int randomId =random.nextInt(userIds.size());
+//                   String newId = userIds.get(randomId);
+                    String newId = userIds.get(random.nextInt(userIds.size()));
+                    newManager = userRepository.findById(newId)
+                            .orElseThrow(() -> new ResourceNotFoundException(User.class, id));
+                }
+                // Manager has employees --> pick another manager to management employees
+                if (newManager.getEmployeeIDs() == null) {
+                    newManager.setEmployeeIDs(new HashSet<>());
+                }
+                newManager.getEmployeeIDs().addAll(manager.getEmployeeIDs());
+
+                userRepository.save(newManager);
+            }
+            // Manager hasn't employees
+            manager.setQuitJob(true);
+            manager.setDateQuitJob(new Date());
+            manager.setReasonQuitJob(dto.getReasonQuitJob());
+            manager.setEmployeeIDs(new HashSet<>());
+
+            userRepository.save(manager);
+        }
+    }
+
+//    public List<User> findManager() {
+//       return userRepository.findAllByRoleAndQuitJob(UserEnum.MANAGER, false);
+//    }
+
 }

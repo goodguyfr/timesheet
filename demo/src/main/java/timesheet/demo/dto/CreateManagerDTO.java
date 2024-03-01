@@ -1,6 +1,7 @@
 package timesheet.demo.dto;
 
 import lombok.Data;
+import lombok.NonNull;
 import timesheet.demo.model.UserEnum;
 
 import java.util.Set;
