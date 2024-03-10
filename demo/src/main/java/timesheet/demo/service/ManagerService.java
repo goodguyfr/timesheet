@@ -7,7 +7,7 @@ import timesheet.demo.dto.DeleteEmployeeDTO;
 import timesheet.demo.dto.DeleteManagerDTO;
 import timesheet.demo.exception.ResourceNotFoundException;
 import timesheet.demo.model.User;
-import timesheet.demo.model.UserEnum;
+import timesheet.demo.modelenum.UserEnum;
 import timesheet.demo.repository.UserRepository;
 
 import java.util.*;

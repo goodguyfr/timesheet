@@ -1,8 +1,8 @@
 package timesheet.demo.dto;
 
 import lombok.Data;
-import lombok.NonNull;
-import timesheet.demo.model.UserEnum;
+import timesheet.demo.modelenum.DepartmentEnum;
+import timesheet.demo.modelenum.UserEnum;
 
 import java.util.Set;
 
@@ -11,9 +11,11 @@ public class CreateManagerDTO {
     private String name;
     private String sex;
     private String image;
-    private String department;
+    private DepartmentEnum department;
     private String company;
     private String salaryPerHour;
     private Set<String> employeeIDs;
     private UserEnum role;
+//    private DepartmentEnum crew;
+
 }
