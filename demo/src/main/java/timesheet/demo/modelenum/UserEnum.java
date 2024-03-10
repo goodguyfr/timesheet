@@ -1,4 +1,4 @@
-package timesheet.demo.model;
+package timesheet.demo.modelenum;
 
 public enum UserEnum {
     EMPLOYEE,

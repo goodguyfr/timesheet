@@ -20,11 +20,12 @@ public class EmployeeController {
 
     @PutMapping("/attach-to-manager/{id}")
     public void updateIdByManager(@RequestBody AttachToManagerDTO dto, @PathVariable("id") String id) {
-        employeeService.updateIdByManager(id, dto);
+        employeeService.attachToManager(id, dto);
     }
 
     @PutMapping("/update/{id}")
     public void updateEmployee(@RequestBody UpdateEmployeeDTO dto, @PathVariable("id") String id) {
         employeeService.updateEmployee(dto, id);
     }
+
 }

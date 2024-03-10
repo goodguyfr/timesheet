@@ -4,6 +4,8 @@ import com.mongodb.lang.Nullable;
 import lombok.Data;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
+import timesheet.demo.modelenum.DepartmentEnum;
+import timesheet.demo.modelenum.UserEnum;
 
 import java.util.Date;
 import java.util.Set;
@@ -18,7 +20,7 @@ public class User {
     private String image;
     @Nullable
     private String managerBy;
-    private String department;
+    private DepartmentEnum department;
     private String company;
     private String salaryPerHour;
     @Nullable
