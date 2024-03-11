@@ -25,7 +25,7 @@ public class EmployeeController {
 
     @PutMapping("/update/{id}")
     public void updateEmployee(@RequestBody UpdateEmployeeDTO dto, @PathVariable("id") String id) {
-        employeeService.updateEmployee(dto, id);
+        employeeService.updateEmployee(id, dto);
     }
 
 }
