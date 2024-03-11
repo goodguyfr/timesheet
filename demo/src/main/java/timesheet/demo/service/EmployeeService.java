@@ -53,7 +53,7 @@ public class EmployeeService {
         }
     }
 
-    public void updateEmployee(UpdateEmployeeDTO dto, String id) {
+    public void updateEmployee(String id, UpdateEmployeeDTO dto) {
         User employee = userRepository.findByIdAndQuitJob(id, false)
                 .orElseThrow(() -> new ResourceNotFoundException(User.class, id));
         if (employee != null) {

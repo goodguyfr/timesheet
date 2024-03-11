@@ -27,7 +27,7 @@ public class User {
     private Set<String> employeeIDs;
     private UserEnum role;
     @Nullable
-    private boolean quitJob;
+    private boolean isQuitJob;
     @Nullable
     private Date dateQuitJob;
     @Nullable
