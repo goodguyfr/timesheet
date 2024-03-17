@@ -22,7 +22,7 @@ public class ScheduleService {
     @Autowired
     UserRepository userRepository;
 
-    public ScheduleDTO toScheduleDTO(ScheduleDTO entity, CreateScheduleByEmployeeDTO dto) {
+    private ScheduleDTO toScheduleDTO(ScheduleDTO entity, CreateScheduleByEmployeeDTO dto) {
         entity.setPlace(dto.getPlace());
         entity.setStartTime(dto.getStartTime());
         entity.setEndTime(dto.getEndTime());
@@ -31,6 +31,10 @@ public class ScheduleService {
         entity.setWeekdays(dto.getWeekdays());
 
         return entity;
+    }
+
+    private String changeData(String data) {
+        return data.replaceAll("\\$", "");
     }
 
     public void createSchedule(ScheduleByEmployeeDTO dto) {
@@ -52,6 +56,7 @@ public class ScheduleService {
                 }
             }
         });
+
         dto.getCreatePlan().forEach(item -> {
             switch (item.getWeekdays()) {
                 case MONDAY -> {
@@ -91,13 +96,13 @@ public class ScheduleService {
                 .orElseThrow(() -> new ResourceNotFoundException(UserSchedule.class, dto));
         schedule.getPlan().forEach(item -> {
             if (weekdays.equals(item.getWeekdays())) {
-                if (!dto.getIsConfirm()) {
+                if (dto.getIsConfirm()) {
+                    item.setIsConfirm(true);
+                } else {
                     item.setIsConfirm(false);
                     item.setNote(dto.getNote());
                     item.setCheckStartTime(dto.getCheckStartTime());
                     item.setCheckEndTime(dto.getCheckEndTime());
-                } else {
-                    item.setIsConfirm(true);
                 }
             }
         });
@@ -142,7 +147,8 @@ public class ScheduleService {
 
         payrollDTO.setEstimatedWorkingTime(estimatedWorkingTime);
 
-        int estimatedTotalWorkingTime = estimatedWorkingTime.stream().reduce(0, Integer::sum); // Tổng thời gian làm việc
+        int estimatedTotalWorkingTime = estimatedWorkingTime.stream()
+                .reduce(0, Integer::sum); // Tổng thời gian làm việc
         User estimated = userRepository.findById(schedule.getUserId()).orElseThrow(() -> new ResourceNotFoundException(User.class, id));
         int estimatedSalary = Integer.parseInt(changeData(estimated.getSalaryPerHour()));
         payrollDTO.setEstimatedSalary(estimatedTotalWorkingTime * estimatedSalary);
@@ -155,10 +161,6 @@ public class ScheduleService {
         payrollDTO.setActualSalary(actualTotalWorkingTime * actualSalary);
 
         return payrollDTO;
-    }
-
-    public String changeData(String data) {
-        return data.replaceAll("\\$", "");
     }
 
 }

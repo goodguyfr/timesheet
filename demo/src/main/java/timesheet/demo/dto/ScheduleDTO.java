@@ -2,7 +2,7 @@ package timesheet.demo.dto;
 
 import com.mongodb.lang.Nullable;
 import lombok.Data;
-import timesheet.demo.modelenum.BaseEnum;
+import timesheet.demo.modelenum.CenterEnum;
 import timesheet.demo.modelenum.WeekdayEnum;
 
 import java.time.LocalDateTime;
@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 public class ScheduleDTO {
     // Create schedule
     private WeekdayEnum weekdays;
-    private BaseEnum place;
+    private CenterEnum place;
     private LocalDateTime startTime;
     private LocalDateTime endTime;
     @Nullable

@@ -23,9 +23,9 @@ public class ScheduleController {
     }
 
     @PutMapping("/confirm-by-manager/{id}")
-    public void checkScheduleByManager(@PathVariable("id")String id, @RequestBody CheckScheduleByManagerDTO dto,
-                                       @RequestParam WeekdayEnum weekdays) {
-        scheduleService.checkScheduleByManager(id, dto, weekdays);
+    public void checkScheduleByManager(@PathVariable("id") String id, @RequestBody CheckScheduleByManagerDTO dto,
+                                       @RequestParam WeekdayEnum weekday) {
+        scheduleService.checkScheduleByManager(id, dto, weekday);
     }
 
 //    @GetMapping("/find-all-schedule")
@@ -35,7 +35,7 @@ public class ScheduleController {
 
     @GetMapping("/payroll/{id}")
     public PayrollDTO payroll(@PathVariable("id") String id) {
-       return  scheduleService.payroll(id);
+        return scheduleService.payroll(id);
     }
 
 }

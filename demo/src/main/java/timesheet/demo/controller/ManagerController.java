@@ -20,12 +20,12 @@ public class ManagerController {
         managerService.createManager(dto);
     }
 
-    @DeleteMapping("/deleteEmployee/{id}")
+    @DeleteMapping("/delete-employee/{id}")
     public void deleteEmployee(@PathVariable("id") String id, @RequestBody DeleteEmployeeDTO dto) {
         managerService.deleteEmployee(id, dto);
     }
 
-    @DeleteMapping("/deleteManager/{id}")
+    @DeleteMapping("/delete-manager/{id}")
     public void deleteManager(@PathVariable("id") String id, @RequestBody DeleteManagerDTO dto) {
         managerService.deleteManager(id, dto);
     }

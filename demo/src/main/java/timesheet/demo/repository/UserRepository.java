@@ -11,6 +11,6 @@ import java.util.Optional;
 @Repository
 public interface UserRepository extends MongoRepository<User, String> {
     Optional<User> findByIdAndQuitJob(String id, boolean deleted);
-    List<User> findAllByRoleAndQuitJob (UserEnum userEnum, boolean deleted);
-//    List<User> findAllByQuitJob(boolean deleted);
+
+    List<User> findAllByRoleAndQuitJob(UserEnum userEnum, boolean deleted);
 }
