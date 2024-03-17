@@ -1,6 +1,5 @@
 package timesheet.demo.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import timesheet.demo.dto.*;
@@ -151,8 +150,8 @@ public class ScheduleService {
         payrollDTO.setActualWorkingTime(actualWorkingTime);
 
         int actualTotalWorkingTime = actualWorkingTime.stream().reduce(0, Integer::sum);
-        User actual = userRepository.findById(schedule.getUserId()).orElseThrow();
-        int actualSalary = Integer.parseInt(changeData(estimated.getSalaryPerHour()));
+        User actual = userRepository.findById(schedule.getUserId()).orElseThrow(() -> new ResourceNotFoundException(User.class, id));
+        int actualSalary = Integer.parseInt(changeData(actual.getSalaryPerHour()));
         payrollDTO.setActualSalary(actualTotalWorkingTime * actualSalary);
 
         return payrollDTO;
