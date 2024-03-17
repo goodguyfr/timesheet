@@ -16,6 +16,4 @@ public class CreateManagerDTO {
     private String salaryPerHour;
     private Set<String> employeeIDs;
     private UserEnum role;
-//    private DepartmentEnum crew;
-
 }

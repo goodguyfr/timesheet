@@ -46,19 +46,17 @@ public class ManagerService {
     public void deleteManager(String id, DeleteManagerDTO dto) {
         User manager = userRepository.findByIdAndQuitJob(id, false)
                 .orElseThrow(() -> new ResourceNotFoundException(User.class, id));
-        if ( manager.getRole().equals(UserEnum.MANAGER)) {
+        if (manager.getRole().equals(UserEnum.MANAGER)) {
             if (manager.getEmployeeIDs() != null) {
                 User newManager = new User();
-
-                if(dto.getNewManagerId() != null) {
-                     newManager = userRepository.findByIdAndQuitJob(dto.getNewManagerId(), false)
+                if (dto.getNewManagerId() != null) {
+                    newManager = userRepository.findByIdAndQuitJob(dto.getNewManagerId(), false)
                             .orElseThrow(() -> new ResourceNotFoundException(User.class, id));
-
                 } else {
                     // Manager has employees --> random manager to management employyes
-                   List<String> userIds = userRepository.findAllByRoleAndQuitJob(manager.getRole(), false)
-                           .stream().map(User::getId).filter(itId -> !itId.equals(id)).toList();
-                   Random  random = new Random();
+                    List<String> userIds = userRepository.findAllByRoleAndQuitJob(manager.getRole(), false)
+                            .stream().map(User::getId).filter(itId -> !itId.equals(id)).toList();
+                    Random random = new Random();
 //                   int randomId =random.nextInt(userIds.size());
 //                   String newId = userIds.get(randomId);
                     String newId = userIds.get(random.nextInt(userIds.size()));

@@ -15,3 +15,19 @@ public class UserSchedule {
     private String userId;
     List<ScheduleDTO> plan;
 }
+
+//class ExampleDTO{
+//    List<UserSchedule> month =new ArrayList<>();
+//
+//    if(dto.month.size>4){
+//        throw
+//    }
+//
+//    public List<UserSchedule> getMonth() {
+//        .loops}{
+//        item.size>5
+//        {
+//            throw
+//        }
+//    }
+//}

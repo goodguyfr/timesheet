@@ -8,5 +8,4 @@ import java.util.List;
 public class ScheduleByEmployeeDTO {
     private String userId;
     List<CreateScheduleByEmployeeDTO> createPlan;
-//    List<CheckScheduleByManagerDTO> checkByManager;
 }
