@@ -3,7 +3,9 @@ package timesheet.demo.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import timesheet.demo.dto.CheckScheduleByManagerDTO;
+import timesheet.demo.dto.PayrollDTO;
 import timesheet.demo.dto.ScheduleByEmployeeDTO;
+import timesheet.demo.model.User;
 import timesheet.demo.modelenum.WeekdayEnum;
 import timesheet.demo.service.ScheduleService;
 
@@ -30,6 +32,11 @@ public class ScheduleController {
 //    public List<UserSchedule> findAllSchedule() {
 //        return scheduleService.findAllSchedule();
 //    }
+
+    @GetMapping("/payroll/{id}")
+    public PayrollDTO payroll(@PathVariable("id") String id) {
+       return  scheduleService.payroll(id);
+    }
 
 }
 

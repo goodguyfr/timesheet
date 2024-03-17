@@ -1,15 +1,18 @@
 package timesheet.demo.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import timesheet.demo.dto.CheckScheduleByManagerDTO;
-import timesheet.demo.dto.ScheduleByEmployeeDTO;
-import timesheet.demo.dto.ScheduleDTO;
+import timesheet.demo.dto.*;
+import timesheet.demo.exception.ExceedLimitException;
 import timesheet.demo.exception.ResourceNotFoundException;
+import timesheet.demo.model.User;
 import timesheet.demo.model.UserSchedule;
 import timesheet.demo.modelenum.WeekdayEnum;
 import timesheet.demo.repository.ScheduleRepository;
+import timesheet.demo.repository.UserRepository;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,6 +20,19 @@ import java.util.List;
 public class ScheduleService {
     @Autowired
     ScheduleRepository scheduleRepository;
+    @Autowired
+    UserRepository userRepository;
+
+    public ScheduleDTO toScheduleDTO(ScheduleDTO entity, CreateScheduleByEmployeeDTO dto) {
+        entity.setPlace(dto.getPlace());
+        entity.setStartTime(dto.getStartTime());
+        entity.setEndTime(dto.getEndTime());
+        entity.setIsLeaveJob(dto.getIsLeaveJob());
+        entity.setLeaveReason(dto.getLeaveReason());
+        entity.setWeekdays(dto.getWeekdays());
+
+        return entity;
+    }
 
     public void createSchedule(ScheduleByEmployeeDTO dto) {
         UserSchedule schedule = new UserSchedule();
@@ -29,55 +45,39 @@ public class ScheduleService {
         ScheduleDTO friday = new ScheduleDTO();
 
         dto.getCreatePlan().forEach(item -> {
+            if (item.getStartTime() != null && item.getEndTime() != null) {
+                Duration workTime = Duration.between(item.getStartTime(), item.getEndTime());
+                int hour = (int) workTime.toMinutes() / 60;
+                if (hour > 24) {
+                    throw new ExceedLimitException(UserSchedule.class, hour);
+                }
+            }
+        });
+        dto.getCreatePlan().forEach(item -> {
             switch (item.getWeekdays()) {
                 case MONDAY -> {
+                    toScheduleDTO(monday, item);
                     monday.setWeekdays(WeekdayEnum.MONDAY);
-                    monday.setPlace(item.getPlace());
-                    monday.setStartTime(item.getStartTime());
-                    monday.setEndTime(item.getEndTime());
-                    monday.setIsLeaveJob(item.getIsLeaveJob());
-                    monday.setLeaveReason(item.getLeaveReason());
-
                     scheduleDTO.add(monday);
                 }
                 case TUESDAY -> {
+                    toScheduleDTO(tuesday, item);
                     tuesday.setWeekdays(WeekdayEnum.TUESDAY);
-                    tuesday.setPlace(item.getPlace());
-                    tuesday.setStartTime(item.getStartTime());
-                    tuesday.setEndTime(item.getEndTime());
-                    tuesday.setIsLeaveJob(item.getIsLeaveJob());
-                    tuesday.setLeaveReason(item.getLeaveReason());
-
                     scheduleDTO.add(tuesday);
                 }
                 case WEDNESDAY -> {
+                    toScheduleDTO(wednesday, item);
                     wednesday.setWeekdays(WeekdayEnum.WEDNESDAY);
-                    wednesday.setPlace(item.getPlace());
-                    wednesday.setStartTime(item.getStartTime());
-                    wednesday.setEndTime(item.getEndTime());
-                    wednesday.setIsLeaveJob(item.getIsLeaveJob());
-                    wednesday.setLeaveReason(item.getLeaveReason());
-
                     scheduleDTO.add(wednesday);
                 }
                 case THURSDAY -> {
+                    toScheduleDTO(thursday, item);
                     thursday.setWeekdays(WeekdayEnum.THURSDAY);
-                    thursday.setPlace(item.getPlace());
-                    thursday.setStartTime(item.getStartTime());
-                    thursday.setEndTime(item.getEndTime());
-                    thursday.setIsLeaveJob(item.getIsLeaveJob());
-                    thursday.setLeaveReason(item.getLeaveReason());
-
                     scheduleDTO.add(thursday);
                 }
                 case FRIDAY -> {
+                    toScheduleDTO(friday, item);
                     friday.setWeekdays(WeekdayEnum.FRIDAY);
-                    friday.setPlace(item.getPlace());
-                    friday.setStartTime(item.getStartTime());
-                    friday.setEndTime(item.getEndTime());
-                    friday.setIsLeaveJob(item.getIsLeaveJob());
-                    friday.setLeaveReason(item.getLeaveReason());
-
                     scheduleDTO.add(friday);
                 }
             }
@@ -109,5 +109,57 @@ public class ScheduleService {
 //    public List<UserSchedule> findAllSchedule() {
 //        return scheduleRepository.findAll();
 //    }
+
+    public PayrollDTO payroll(String id) {
+        UserSchedule schedule = scheduleRepository.findByUserId(id)
+                .orElseThrow(() -> new ResourceNotFoundException(UserSchedule.class, id));
+
+        PayrollDTO payrollDTO = new PayrollDTO();
+        List<Integer> estimatedWorkingTime = new ArrayList<>();
+        List<Integer> actualWorkingTime = new ArrayList<>();
+
+        schedule.getPlan().forEach(item -> {
+            if (item.getStartTime() != null && item.getEndTime() != null) {
+                if (item.getIsConfirm()) {
+                    Duration workTime = Duration.between(item.getStartTime(), item.getEndTime());
+//                    int hours = (int) workTime.toHours();
+                    Integer minutes = (int) workTime.toMinutes() / 60;
+                    estimatedWorkingTime.add(minutes);
+                    actualWorkingTime.add(minutes);
+
+                } else {
+                    Duration estimatedWorkTime = Duration.between(item.getStartTime(), item.getEndTime());
+//                    int estimatedHours = (int) estimatedWorkTime.toHours();
+                    Integer estimatedMinutes = (int) estimatedWorkTime.toMinutes() / 60;
+                    estimatedWorkingTime.add(estimatedMinutes);
+
+                    Duration actualWorkTime = Duration.between(item.getCheckStartTime(), item.getCheckEndTime());
+//                    int actualHours = (int) actualWorkTime.toHours();
+                    Integer actualMinutes = (int) actualWorkTime.toMinutes() / 60;
+                    actualWorkingTime.add(actualMinutes);
+                }
+            }
+        });
+
+        payrollDTO.setEstimatedWorkingTime(estimatedWorkingTime);
+
+        int estimatedTotalWorkingTime = estimatedWorkingTime.stream().reduce(0, Integer::sum); // Tổng thời gian làm việc
+        User estimated = userRepository.findById(schedule.getUserId()).orElseThrow(() -> new ResourceNotFoundException(User.class, id));
+        int estimatedSalary = Integer.parseInt(changeData(estimated.getSalaryPerHour()));
+        payrollDTO.setEstimatedSalary(estimatedTotalWorkingTime * estimatedSalary);
+
+        payrollDTO.setActualWorkingTime(actualWorkingTime);
+
+        int actualTotalWorkingTime = actualWorkingTime.stream().reduce(0, Integer::sum);
+        User actual = userRepository.findById(schedule.getUserId()).orElseThrow();
+        int actualSalary = Integer.parseInt(changeData(estimated.getSalaryPerHour()));
+        payrollDTO.setActualSalary(actualTotalWorkingTime * actualSalary);
+
+        return payrollDTO;
+    }
+
+    public String changeData(String data) {
+        return data.replaceAll("\\$", "");
+    }
 
 }
